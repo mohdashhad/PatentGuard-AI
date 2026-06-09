@@ -9,3 +9,4 @@ streamlit
 requests
 google-search-results
 duckduckgo-search
+sentence-transformers
