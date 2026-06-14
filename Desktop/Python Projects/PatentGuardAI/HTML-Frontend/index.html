@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatentGuard AI - Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="pg-shell" id="main-app">
+    
+    <div class="pg-sidebar">
+        <div class="pg-logo">
+            <div class="pg-logo-icon"><i class="ti ti-shield-check"></i></div>
+            <div>
+                <div class="pg-logo-text">PatentGuard</div>
+                <div class="pg-logo-sub">HTML/JS Engine (Live)</div>
+            </div>
+        </div>
+
+        <nav class="pg-nav">
+            <div class="pg-nav-section">Main Menu</div>
+            <div class="pg-nav-item active" onclick="switchTab('dashboard', this)">
+                <i class="ti ti-layout-dashboard"></i> Dashboard
+            </div>
+            <div class="pg-nav-item" onclick="switchTab('patents', this)">
+                <i class="ti ti-file-text"></i> My patents
+                <span class="pg-nav-badge" id="nav-badge">0</span>
+            </div>
+            <div class="pg-nav-item" onclick="switchTab('upload', this)">
+                <i class="ti ti-upload"></i> Upload
+            </div>
+
+            <div class="pg-nav-section" style="margin-top: 16px;">Analysis</div>
+            <div class="pg-nav-item" onclick="switchTab('rag', this)">
+                <i class="ti ti-brain"></i> RAG search
+            </div>
+            <div class="pg-nav-item" onclick="switchTab('claim', this)">
+                <i class="ti ti-list-check"></i> Claim review
+            </div>
+            <div class="pg-nav-item" onclick="switchTab('evidence', this)">
+                <i class="ti ti-certificate"></i> Evidence check
+            </div>
+        </nav>
+
+        <div class="pg-sidebar-bottom">
+            <div class="pg-user" onclick="alert('Logged out from Session.')">
+                <div class="pg-avatar">👤</div>
+                <div>
+                    <div class="pg-user-name" id="display-user-name">Mohd Ashhad</div>
+                    <div class="pg-user-role">● System Online</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pg-main">
+        <div class="pg-topbar">
+            <div>
+                <div class="pg-topbar-title" id="topbar-title">Dashboard</div>
+                <div class="pg-topbar-sub">System status and overview</div>
+            </div>
+            <div class="pg-topbar-actions">
+                <button class="pg-btn pg-btn-primary" onclick="switchTab('upload', document.querySelectorAll('.pg-nav-item')[2])">
+                    <i class="ti ti-plus"></i> New Upload
+                </button>
+            </div>
+        </div>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="pg-stats">
+                <div class="pg-stat">
+                    <div class="pg-stat-label"><span class="pg-stat-dot dot-blue"></span> Total Patents</div>
+                    <div class="pg-stat-value" id="stat-total">0</div>
+                    <div class="pg-stat-sub">Uploaded in database</div>
+                </div>
+                <div class="pg-stat">
+                    <div class="pg-stat-label"><span class="pg-stat-dot dot-green"></span> Analyzed</div>
+                    <div class="pg-stat-value" id="stat-analyzed">0</div>
+                    <div class="pg-stat-sub" id="stat-percent">0% complete</div>
+                </div>
+                <div class="pg-stat">
+                    <div class="pg-stat-label"><span class="pg-stat-dot dot-amber"></span> Pending review</div>
+                    <div class="pg-stat-value" id="stat-pending">0</div>
+                    <div class="pg-stat-sub">Action needed</div>
+                </div>
+                <div class="pg-stat">
+                    <div class="pg-stat-label"><span class="pg-stat-dot dot-red"></span> High risk</div>
+                    <div class="pg-stat-value" id="stat-risk">0</div>
+                    <div class="pg-stat-sub">Conflict found</div>
+                </div>
+            </div>
+
+            <div class="pg-section-title">Recent Uploads</div>
+            <div class="pg-patent-list" id="patent-list-container"></div>
+        </div>
+
+        <div id="patents" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div class="pg-section-title" style="margin-bottom: 0;">Database Records</div>
+                <button class="pg-btn" style="background: #FCEBEB; color: #A32D2D; border-color: #FCEBEB;" onclick="clearDatabase()">
+                    <i class="ti ti-trash" style="font-size: 16px;"></i> Clear Entire Database
+                </button>
+            </div>
+            <div class="pg-patent-list" id="full-patent-list"></div>
+        </div>
+
+        <div id="upload" class="tab-content">
+            <input type="file" id="fileInput" accept=".pdf" onchange="handleFileSelect(event)">
+            <div class="pg-upload-zone" onclick="document.getElementById('fileInput').click()">
+                <i class="ti ti-cloud-upload"></i>
+                <div class="pg-upload-title" id="upload-status">Click to Browse Document</div>
+                <div class="pg-upload-sub">Upload PDF direct to Hugging Face API</div>
+                <button class="pg-btn pg-btn-primary" style="margin-top: 24px;">Select File</button>
+            </div>
+        </div>
+
+        <div id="rag" class="tab-content">
+            <div style="background: white; border: 1px solid var(--color-border-tertiary); border-radius: 12px; padding: 24px;">
+                <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">AI Patent Engine (RAG)</h2>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="rag-input" placeholder="Apne patents ke baare mein sawal puchiye..." style="flex: 1; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 14px;" onkeypress="if(event.key === 'Enter') runRagSearch()">
+                    <button class="pg-btn pg-btn-primary" id="rag-btn" onclick="runRagSearch()">
+                        <i class="ti ti-search"></i> Search AI
+                    </button>
+                </div>
+                <div id="rag-output" style="margin-top: 24px; padding: 24px; text-align: left; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; min-height: 150px; overflow-y: auto;">
+                    <div style="text-align:center; color: #94a3b8; margin-top: 20px;">
+                        <i class="ti ti-robot" style="font-size: 40px; margin-bottom: 10px;"></i>
+                        <p>AI response will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="claim" class="tab-content">
+            <div style="background: white; border: 1px solid var(--color-border-tertiary); border-radius: 12px; padding: 32px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <i class="ti ti-clipboard-list" style="font-size: 36px; color: #64748b;"></i>
+                    <h2 style="font-size: 28px; font-weight: 700; color: #1e293b;">AI Claim Review & Legal Analysis</h2>
+                </div>
+                <button id="claim-generate-btn" class="pg-btn" style="background: #ef4444; color: white; border: none; margin-bottom: 24px; font-size: 14px; padding: 10px 20px;" onclick="runClaimAnalysis()">
+                    <i class="ti ti-settings"></i> Generate Full Legal Report
+                </button>
+                <div id="claim-loading" style="display: none; padding: 40px; text-align: center; color: #ef4444;">
+                    <i class="ti ti-loader ti-spin" style="font-size: 48px;"></i>
+                    <p style="margin-top: 16px; font-weight: 500; font-size: 16px;">AI is analyzing claims via Hugging Face...</p>
+                </div>
+                <div id="claim-results" style="display: none;">
+                    <div style="background: #dcfce7; color: #166534; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; font-size: 15px;">Analysis Complete!</div>
+                    <div style="background: #e0f2fe; padding: 24px; border-radius: 8px; margin-bottom: 24px; color: #0369a1; line-height: 1.6; font-size: 14px;">
+                        <strong style="display:block; margin-bottom:8px;">Claim Analysis:</strong><div id="claim-box-1"></div>
+                    </div>
+                    <div style="background: #fef9c3; padding: 24px; border-radius: 8px; margin-bottom: 24px; color: #854d0e; line-height: 1.6; font-size: 14px;">
+                        <strong style="display:block; margin-bottom:8px;">Legal Review:</strong><div id="claim-box-2"></div>
+                    </div>
+                    <div style="background: #e7f1db; padding: 24px; border-radius: 8px; color: #3b6d11; line-height: 1.6; font-size: 14px;">
+                        <strong style="display:block; margin-bottom:8px;">Suggestions:</strong><div id="claim-box-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="evidence" class="tab-content">
+            <div style="background: white; border: 1px solid var(--color-border-tertiary); border-radius: 12px; padding: 32px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <i class="ti ti-certificate" style="font-size: 36px; color: #534AB7;"></i>
+                    <h2 style="font-size: 28px; font-weight: 700; color: #1e293b;">Live Evidence Check</h2>
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+                    <input type="text" id="evidence-input" placeholder="Enter your invention idea..." style="flex: 1; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 14px;" onkeypress="if(event.key === 'Enter') runEvidenceCheck()">
+                    <button class="pg-btn pg-btn-primary" id="evidence-btn" onclick="runEvidenceCheck()">
+                        <i class="ti ti-world"></i> Search Live Internet
+                    </button>
+                </div>
+                <div id="evidence-output" style="text-align: left; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; min-height: 150px; padding: 24px;">
+                    <div style="text-align:center; color: #94a3b8; margin-top: 20px;">
+                        <i class="ti ti-file-search" style="font-size: 40px; margin-bottom: 10px;"></i>
+                        <p>Live internet search results will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pg-side-panel" id="right-panel">
+        <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 0.05em;">Analysis Preview</div>
+        <div class="pg-ring"><div class="pg-ring-val" id="score-val">0</div><div class="pg-ring-lbl">/ 100</div></div>
+        <div style="text-align: center; font-size: 14px; color: #0f172a; margin-top: 15px; margin-bottom: 30px; font-weight: 400;">Overall patent strength</div>
+        
+        <div class="custom-prog-container">
+            <div class="custom-prog-header"><span>Claim clarity</span><span class="custom-prog-val" id="val-clarity">0%</span></div>
+            <div class="custom-prog-bg"><div class="custom-prog-fill" id="bar-clarity" style="width: 0%; background: #7A69E6;"></div></div>
+        </div>
+        <div class="custom-prog-container">
+            <div class="custom-prog-header"><span>Prior art clearance</span><span class="custom-prog-val" id="val-prior">0%</span></div>
+            <div class="custom-prog-bg"><div class="custom-prog-fill" id="bar-prior" style="width: 0%; background: #B4782A;"></div></div>
+        </div>
+        <div class="custom-prog-container">
+            <div class="custom-prog-header"><span>Evidence support</span><span class="custom-prog-val" id="val-evidence">0%</span></div>
+            <div class="custom-prog-bg"><div class="custom-prog-fill" id="bar-evidence" style="width: 0%; background: #6E9B34;"></div></div>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 600; color: #0f172a; text-transform: uppercase; margin: 30px 0 15px;">Key Findings</div>
+        <div id="key-findings-container"></div>
+
+        <button onclick="switchTab('claim', document.querySelectorAll('.pg-nav-item')[4])" style="width: 100%; background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; margin-top: 20px; transition: 0.2s;">
+            Generate full report ↗
+        </button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>   
+
