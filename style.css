@@ -107,3 +107,54 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
 
 @keyframes spin { 100% { transform: rotate(360deg); } }
 .ti-spin { animation: spin 1s linear infinite; display: inline-block; }      
+/* ================= MOBILE RESPONSIVENESS ================= */
+@media (max-width: 768px) {
+    /* Main container ko column mein badalna */
+    .pg-shell { 
+        flex-direction: column; 
+        overflow-y: auto; 
+    }
+    
+    /* Sidebar ko upar set karna aur scrollable banana */
+    .pg-sidebar { 
+        width: 100%; 
+        min-width: 100%; 
+        height: auto;
+        border-right: none; 
+        border-bottom: 1px solid var(--color-border-tertiary); 
+    }
+    
+    .pg-nav { 
+        display: flex; 
+        overflow-x: auto; /* Mobile mein menu side-scroll hoga */
+        white-space: nowrap; 
+        padding: 10px; 
+    }
+    
+    .pg-nav-item { 
+        margin-bottom: 0; 
+        margin-right: 10px; 
+    }
+    
+    .pg-nav-section, .pg-sidebar-bottom { 
+        display: none; /* Mobile mein space bachane ke liye extra text hide kar diya */
+    }
+
+    /* Stats box ko ek ke neeche ek (stack) karna */
+    .pg-stats { 
+        grid-template-columns: 1fr; 
+    }
+
+    /* Right panel (Ring chart) ko sabse neeche lana */
+    .pg-side-panel { 
+        width: 100%; 
+        border-left: none; 
+        border-top: 1px solid var(--color-border-tertiary); 
+    }
+    
+    /* Scroll fix */
+    .tab-content { 
+        height: auto; 
+        overflow: visible;
+    }
+}    
